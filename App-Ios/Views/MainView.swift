@@ -1,27 +1,15 @@
 import SwiftUI
 
 struct MainView: View {
-    @State private var trips: [Day] = [
-        Day(
-            date: Date(),
-            activities: [Activity(name: "Visit Museum"), Activity(name: "Explore Park")],
-            accommodations: [Accommodation(name: "Hotel ABC")],
-            transportation: [Transportation(type: "Bus")]
-        ),
-        Day(
-            date: Date().addingTimeInterval(86400), // Next day
-            activities: [Activity(name: "Go Hiking")],
-            accommodations: [Accommodation(name: "Cabin XYZ")],
-            transportation: [Transportation(type: "Car")]
-        )
-    ]
+    @StateObject private var tripViewModel = TripViewModel() // Use ViewModel for managing trips
+    @State private var showAddTripSheet = false // Track the sheet visibility
 
     var body: some View {
         NavigationStack {
             List {
-                ForEach(trips) { trip in
-                    ItineraryCard(day: trip) {
-                        print("Tapped on \(trip.date)")
+                ForEach(tripViewModel.trips) { trip in
+                    NavigationLink(destination: TripDetailsView(viewModel: tripViewModel, trip: trip)) {
+                        TripCardView(trip: trip)
                     }
                     .padding(.vertical, 5)
                 }
@@ -30,10 +18,20 @@ struct MainView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     AddTripButton {
-                        print("Add trip tapped")
+                        showAddTripSheet.toggle() // Show the Add Trip view
                     }
                 }
             }
+            .sheet(isPresented: $showAddTripSheet) {
+                AddTripView(viewModel: tripViewModel) // Pass the ViewModel to AddTripView
+            }
         }
+    }
+}
+
+// Preview Struct
+struct MainView_Previews: PreviewProvider {
+    static var previews: some View {
+        MainView()
     }
 }
