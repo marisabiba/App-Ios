@@ -14,17 +14,20 @@ final class TripViewModel: ObservableObject {
     }
 
     func addTrip(_ trip: Trip) {
-        // Initialize empty days for the trip
         var newTrip = trip
         let calendar = Calendar.current
-        let numberOfDays = trip.numberOfDays
+        
+        // Calculate days including both start and end dates
+        let numberOfDays = calendar.dateComponents([.day], from: calendar.startOfDay(for: trip.startDate), 
+                                                 to: calendar.startOfDay(for: trip.endDate)).day ?? 0
+        let totalDays = numberOfDays + 1  // Add 1 to include both start and end dates
         
         var days: [TripDay] = []
-        for dayIndex in 0..<numberOfDays {
-            if let date = calendar.date(byAdding: .day, value: dayIndex, to: trip.startDate) {
+        for dayIndex in 0..<totalDays {
+            if let date = calendar.date(byAdding: .day, value: dayIndex, to: calendar.startOfDay(for: trip.startDate)) {
                 let day = TripDay(
                     date: date,
-                    title: "",
+                    title: "Day \(dayIndex + 1)",
                     activities: [],
                     transportationDetails: TransportationDetails(mode: "", time: date),
                     budgetDetails: BudgetDetails(amount: 0),
@@ -58,13 +61,16 @@ final class TripViewModel: ObservableObject {
 
     func updateTrip(id: UUID, name: String, startDate: Date, endDate: Date) {
         if let index = trips.firstIndex(where: { $0.id == id }) {
-            // Create an array of TripDays based on the date range
             let calendar = Calendar.current
-            let numberOfDays = calendar.dateComponents([.day], from: startDate, to: endDate).day ?? 0 + 1
+            
+            // Calculate days including both start and end dates
+            let numberOfDays = calendar.dateComponents([.day], from: calendar.startOfDay(for: startDate), 
+                                                     to: calendar.startOfDay(for: endDate)).day ?? 0
+            let totalDays = numberOfDays + 1  // Add 1 to include both start and end dates
             
             var days: [TripDay] = []
-            for dayOffset in 0..<numberOfDays {
-                if let date = calendar.date(byAdding: .day, value: dayOffset, to: startDate) {
+            for dayOffset in 0..<totalDays {
+                if let date = calendar.date(byAdding: .day, value: dayOffset, to: calendar.startOfDay(for: startDate)) {
                     let tripDay = TripDay(
                         date: date,
                         title: "Day \(dayOffset + 1)",
