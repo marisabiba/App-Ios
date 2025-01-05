@@ -2,20 +2,38 @@ import SwiftUI
 
 struct TripCardView: View {
     let trip: Trip
-
+    
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 8) {
             Text(trip.name)
                 .font(.headline)
-            Text("Start: \(formattedDate(trip.startDate))")
-            Text("End: \(formattedDate(trip.endDate))")
+            
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("Start:")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    Text(formattedDate(trip.startDate))
+                        .font(.subheadline)
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .leading) {
+                    Text("End:")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    Text(formattedDate(trip.endDate))
+                        .font(.subheadline)
+                }
+            }
         }
         .padding()
-        .background(Color.gray.opacity(0.1))
+        .background(Color(.systemBackground))
         .cornerRadius(10)
-        .padding(.horizontal)
+        .shadow(radius: 2)
     }
-
+    
     private func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
@@ -25,6 +43,12 @@ struct TripCardView: View {
 
 struct TripCardView_Previews: PreviewProvider {
     static var previews: some View {
-        TripCardView(trip: Trip(name: "Beach Vacation", startDate: Date(), endDate: Date()))
+        let sampleTrip = Trip(name: "Sample Trip", 
+                            startDate: Date(), 
+                            endDate: Date().addingTimeInterval(86400 * 3))
+        
+        TripCardView(trip: sampleTrip)
+            .previewLayout(.sizeThatFits)
+            .padding()
     }
 }

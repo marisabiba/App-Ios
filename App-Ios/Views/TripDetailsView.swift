@@ -52,3 +52,14 @@ struct TripDetailsView: View {
         return formatter.string(from: date)
     }
 }
+
+struct TripDetailsView_Previews: PreviewProvider {
+    static var previews: some View {
+        let viewModel = TripViewModel()
+        let sampleTrip = Trip(name: "Sample Trip", 
+                            startDate: Date(), 
+                            endDate: Date().addingTimeInterval(86400 * 3))
+        
+        TripDetailsView(viewModel: viewModel, trip: sampleTrip)
+    }
+}

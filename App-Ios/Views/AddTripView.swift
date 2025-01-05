@@ -1,38 +1,34 @@
 import SwiftUI
 
 struct AddTripView: View {
-    @ObservedObject var viewModel: TripViewModel // Pass ViewModel from parent
-    @Environment(\.presentationMode) var presentationMode
-
-    @State private var tripName: String = ""
-    @State private var startDate: Date = Date()
-    @State private var endDate: Date = Date()
-
+    @Environment(\.dismiss) var dismiss
+    @ObservedObject var viewModel: TripViewModel
+    
+    @State private var tripName = ""
+    @State private var startDate = Date()
+    @State private var endDate = Date().addingTimeInterval(86400) // Next day
+    
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Trip Details")) {
-                    TextField("Trip Name", text: $tripName)
-                    DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
-                    DatePicker("End Date", selection: $endDate, displayedComponents: .date)
-                }
+                TextField("Trip Name", text: $tripName)
+                DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
+                DatePicker("End Date", selection: $endDate, displayedComponents: .date)
             }
-            .navigationTitle("Add Trip")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
-                    }
+            .navigationTitle("New Trip")
+            .navigationBarItems(
+                leading: Button("Cancel") {
+                    dismiss()
+                },
+                trailing: Button("Add") {
+                    let newTrip = Trip(name: tripName,
+                                     startDate: startDate,
+                                     endDate: endDate)
+                    viewModel.addTrip(trip: newTrip)
+                    dismiss()
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        let newTrip = Trip(name: tripName, startDate: startDate, endDate: endDate)
-                        viewModel.addTrip(trip: newTrip)
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                    .disabled(tripName.isEmpty) // Disable save if name is empty
-                }
-            }
+                .disabled(tripName.isEmpty)
+            )
         }
     }
 }
