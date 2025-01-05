@@ -14,7 +14,7 @@ struct ItineraryView: View {
                 } else {
                     ScrollView {
                         ForEach(tripViewModel.trips) { trip in
-                            NavigationLink(destination: TripDetailsView(trip: trip)) {
+                            NavigationLink(destination: TripDetailsView(viewModel: tripViewModel, trip: trip)) {
                                 TripCardView(trip: trip) // Custom card view
                                     .padding(.horizontal)
                             }
