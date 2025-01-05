@@ -9,12 +9,25 @@ struct AddTripView: View {
     @State private var endDate = Date()
     @State private var showTripDetails = false
     @State private var newTrip: Trip?
+    @State private var selectedPlace: Place?
     
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Trip Details")) {
                     TextField("Trip Name", text: $tripName)
+                    
+                    PlaceSearchView(selectedPlace: $selectedPlace)
+                    
+                    if let place = selectedPlace {
+                        HStack {
+                            Text("Destination:")
+                            Spacer()
+                            Text(place.name)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
                     DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
                     DatePicker("End Date", selection: $endDate, displayedComponents: .date)
                 }
@@ -48,9 +61,10 @@ struct AddTripView: View {
     private func createTrip() {
         let trip = Trip(
             name: tripName,
+            destination: selectedPlace,
             startDate: startDate,
             endDate: endDate,
-            days: [] // Empty array of days initially
+            days: []
         )
         viewModel.addTrip(trip)
         newTrip = trip

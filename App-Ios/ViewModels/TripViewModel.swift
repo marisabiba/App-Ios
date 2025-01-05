@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 final class TripViewModel: ObservableObject {
     @Published var trips: [Trip] = [] {
@@ -8,6 +9,9 @@ final class TripViewModel: ObservableObject {
     }
 
     private let tripsKey = "savedTrips"
+    private let placesService = PlacesService()
+    private let unsplashService = UnsplashService()
+    private var cancellables = Set<AnyCancellable>()
 
     init() {
         loadTrips()
@@ -15,6 +19,21 @@ final class TripViewModel: ObservableObject {
 
     func addTrip(_ trip: Trip) {
         var newTrip = trip
+        
+        // If there's a destination, fetch its image
+        if let destination = trip.destination {
+            fetchDestinationImage(for: destination)
+                .receive(on: DispatchQueue.main)
+                .sink(
+                    receiveCompletion: { _ in },
+                    receiveValue: { imageUrl in
+                        newTrip.destinationImageUrl = imageUrl
+                        self.updateTripImage(id: newTrip.id, imageUrl: imageUrl)
+                    }
+                )
+                .store(in: &cancellables)
+        }
+        
         let calendar = Calendar.current
         
         // Calculate days including both start and end dates
@@ -112,6 +131,16 @@ final class TripViewModel: ObservableObject {
     func updateBudget(tripId: UUID, dayIndex: Int, budget: BudgetDetails) {
         if let tripIndex = trips.firstIndex(where: { $0.id == tripId }) {
             trips[tripIndex].days[dayIndex].budgetDetails = budget
+        }
+    }
+
+    func fetchDestinationImage(for place: Place) -> AnyPublisher<String?, Error> {
+        return unsplashService.searchCityImage(query: place.name)
+    }
+
+    private func updateTripImage(id: UUID, imageUrl: String?) {
+        if let index = trips.firstIndex(where: { $0.id == id }) {
+            trips[index].destinationImageUrl = imageUrl
         }
     }
 }
