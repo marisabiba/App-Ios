@@ -13,8 +13,34 @@ final class TripViewModel: ObservableObject {
         loadTrips()
     }
 
-    func addTrip(trip: Trip) {
-        trips.append(trip)
+    func addTrip(_ trip: Trip) {
+        // Initialize empty days for the trip
+        var newTrip = trip
+        let calendar = Calendar.current
+        let numberOfDays = trip.numberOfDays
+        
+        var days: [TripDay] = []
+        for dayIndex in 0..<numberOfDays {
+            if let date = calendar.date(byAdding: .day, value: dayIndex, to: trip.startDate) {
+                let day = TripDay(
+                    date: date,
+                    title: "",
+                    activities: [],
+                    transportationDetails: TransportationDetails(mode: "", time: date),
+                    budgetDetails: BudgetDetails(amount: 0),
+                    checklist: []
+                )
+                days.append(day)
+            }
+        }
+        
+        newTrip.days = days
+        trips.append(newTrip)
+    }
+
+    func addActivity(to trip: Trip, dayIndex: Int, activity: Activity) {
+        guard let tripIndex = trips.firstIndex(where: { $0.id == trip.id }) else { return }
+        trips[tripIndex].days[dayIndex].activities.append(activity)
     }
 
     private func saveTrips() {

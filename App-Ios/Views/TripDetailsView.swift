@@ -2,56 +2,101 @@ import SwiftUI
 
 struct TripDetailsView: View {
     @ObservedObject var viewModel: TripViewModel
+    @State private var selectedTab = 0
     let trip: Trip
-    @State private var isEditing = false
-    @State private var editedName: String
-    @State private var editedStartDate: Date
-    @State private var editedEndDate: Date
     
-    init(viewModel: TripViewModel, trip: Trip) {
-        self.viewModel = viewModel
-        self.trip = trip
-        _editedName = State(initialValue: trip.name)
-        _editedStartDate = State(initialValue: trip.startDate)
-        _editedEndDate = State(initialValue: trip.endDate)
-    }
-
     var body: some View {
-        Form {
-            if isEditing {
-                Section("Trip Details") {
-                    TextField("Trip Name", text: $editedName)
-                    DatePicker("Start Date", selection: $editedStartDate, displayedComponents: .date)
-                    DatePicker("End Date", selection: $editedEndDate, displayedComponents: .date)
+        TabView(selection: $selectedTab) {
+            ForEach(0..<trip.numberOfDays, id: \.self) { dayIndex in
+                DayPlanView(
+                    viewModel: viewModel,
+                    trip: trip,
+                    dayIndex: dayIndex,
+                    date: Calendar.current.date(byAdding: .day, value: dayIndex, to: trip.startDate) ?? trip.startDate
+                )
+                .tabItem {
+                    Text("Day \(dayIndex + 1)")
                 }
-            } else {
-                Section("Trip Details") {
-                    Text(trip.name)
-                    Text("Start Date: \(formattedDate(trip.startDate))")
-                    Text("End Date: \(formattedDate(trip.endDate))")
-                }
+                .tag(dayIndex)
             }
         }
-        .navigationTitle("Trip Details")
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(isEditing ? "Save" : "Edit") {
-                    if isEditing {
-                        // Save changes
-                        viewModel.updateTrip(id: trip.id, name: editedName, startDate: editedStartDate, endDate: editedEndDate)
-                    }
-                    isEditing.toggle()
-                }
-            }
-        }
-    }
-
-    private func formattedDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: date)
+        .navigationTitle("\(trip.name) - Itinerary")
     }
 }
+
+struct DayPlanView: View {
+    @ObservedObject var viewModel: TripViewModel
+    let trip: Trip
+    let dayIndex: Int
+    let date: Date
+    @State private var showingAddActivity = false
+    @State private var dayTitle = ""
+    
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                // Day Header
+                DayHeaderSection(date: date, dayTitle: $dayTitle)
+                
+                // Activities Section
+                ActivitiesSection(
+                    activities: trip.days[dayIndex].activities,
+                    onAddActivity: { showingAddActivity = true }
+                )
+                
+                // Transportation Details
+                TransportationSection(transportation: trip.days[dayIndex].transportationDetails)
+                
+                // Budget Details
+                BudgetSection(budget: trip.days[dayIndex].budgetDetails)
+                
+                // Checklist
+                ChecklistSection(checklist: trip.days[dayIndex].checklist)
+            }
+            .padding()
+        }
+        .sheet(isPresented: $showingAddActivity) {
+            AddActivityView(viewModel: viewModel, trip: trip, dayIndex: dayIndex)
+        }
+    }
+}
+
+// Helper Views
+struct DayHeaderSection: View {
+    let date: Date
+    @Binding var dayTitle: String
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(date.formatted(date: .long, time: .omitted))
+                .font(.headline)
+            TextField("Day Title", text: $dayTitle)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+        }
+    }
+}
+
+struct ActivitiesSection: View {
+    let activities: [Activity]
+    let onAddActivity: () -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Activities (\(activities.count))")
+                .font(.headline)
+            
+            ForEach(activities) { activity in
+                ActivityCard(activity: activity)
+            }
+            
+            Button(action: onAddActivity) {
+                Label("Add Activity", systemImage: "plus.circle.fill")
+            }
+        }
+    }
+}
+
+// Add other helper views for Transportation, Budget, and Checklist sections...
 
 struct TripDetailsView_Previews: PreviewProvider {
     static var previews: some View {
