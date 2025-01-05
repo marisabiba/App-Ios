@@ -4,85 +4,33 @@ struct TripCardView: View {
     let trip: Trip
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Destination Image
-            if let imageUrlString = trip.destinationImageUrl,
-               let imageUrl = URL(string: imageUrlString) {
-                AsyncImage(url: imageUrl) { phase in
-                    switch phase {
-                    case .empty:
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.2))
-                            .frame(height: 150)
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(height: 150)
-                            .clipped()
-                    case .failure(_):
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.2))
-                            .frame(height: 150)
-                            .overlay(
-                                Image(systemName: "photo.fill")
-                                    .foregroundColor(.gray)
-                            )
-                    @unknown default:
-                        EmptyView()
-                    }
-                }
-            } else {
-                Rectangle()
-                    .fill(Color.gray.opacity(0.2))
-                    .frame(height: 150)
-                    .overlay(
-                        Image(systemName: "photo.fill")
-                            .foregroundColor(.gray)
-                    )
-            }
+        VStack(alignment: .leading, spacing: 8) {
+            Text(trip.name)
+                .font(.headline)
             
-            VStack(alignment: .leading, spacing: 8) {
-                // Trip Name and Destination
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(trip.name)
-                        .font(.headline)
-                    
-                    if let destination = trip.destination {
-                        Text(destination.name)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("Start:")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    Text(formattedDate(trip.startDate))
+                        .font(.subheadline)
                 }
-                .padding(.horizontal)
-                .padding(.top, 12)
                 
-                // Dates
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("Start:")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                        Text(formattedDate(trip.startDate))
-                            .font(.subheadline)
-                    }
-                    
-                    Spacer()
-                    
-                    VStack(alignment: .leading) {
-                        Text("End:")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                        Text(formattedDate(trip.endDate))
-                            .font(.subheadline)
-                    }
+                Spacer()
+                
+                VStack(alignment: .leading) {
+                    Text("End:")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    Text(formattedDate(trip.endDate))
+                        .font(.subheadline)
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 12)
             }
         }
+        .padding()
         .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .cornerRadius(10)
         .shadow(radius: 2)
     }
     
@@ -93,19 +41,11 @@ struct TripCardView: View {
     }
 }
 
-// Preview
 struct TripCardView_Previews: PreviewProvider {
     static var previews: some View {
         let sampleTrip = Trip(
-            name: "Sample Trip",
-            destination: Place(
-                id: "123",
-                name: "Paris",
-                fullName: "Paris, France",
-                photoReference: nil
-            ),
-            destinationImageUrl: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
-            startDate: Date(),
+            name: "Sample Trip", 
+            startDate: Date(), 
             endDate: Date().addingTimeInterval(86400 * 3),
             days: [
                 TripDay(
@@ -119,25 +59,8 @@ struct TripCardView_Previews: PreviewProvider {
             ]
         )
         
-        VStack {
-            // Preview with image
-            TripCardView(trip: sampleTrip)
-            
-            // Preview without image
-            TripCardView(trip: Trip(
-                name: "Trip without image",
-                destination: Place(
-                    id: "456",
-                    name: "London",
-                    fullName: "London, UK",
-                    photoReference: nil
-                ),
-                startDate: Date(),
-                endDate: Date().addingTimeInterval(86400 * 3),
-                days: []
-            ))
-        }
-        .padding()
-        .previewLayout(.sizeThatFits)
+        TripCardView(trip: sampleTrip)
+            .previewLayout(.sizeThatFits)
+            .padding()
     }
 }

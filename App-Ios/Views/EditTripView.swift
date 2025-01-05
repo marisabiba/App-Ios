@@ -1,14 +1,21 @@
 import SwiftUI
 
-struct AddTripView: View {
+struct EditTripView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var viewModel: TripViewModel
+    let trip: Trip
     
-    @State private var tripName = ""
-    @State private var startDate = Date()
-    @State private var endDate = Date()
-    @State private var showTripDetails = false
-    @State private var newTrip: Trip?
+    @State private var tripName: String
+    @State private var startDate: Date
+    @State private var endDate: Date
+    
+    init(viewModel: TripViewModel, trip: Trip) {
+        self.viewModel = viewModel
+        self.trip = trip
+        _tripName = State(initialValue: trip.name)
+        _startDate = State(initialValue: trip.startDate)
+        _endDate = State(initialValue: trip.endDate)
+    }
     
     var body: some View {
         NavigationView {
@@ -19,7 +26,7 @@ struct AddTripView: View {
                     DatePicker("End Date", selection: $endDate, displayedComponents: .date)
                 }
             }
-            .navigationTitle("New Trip")
+            .navigationTitle("Edit Trip")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -30,30 +37,17 @@ struct AddTripView: View {
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        createTrip()
+                        viewModel.updateTrip(
+                            id: trip.id,
+                            name: tripName,
+                            startDate: startDate,
+                            endDate: endDate
+                        )
                         dismiss()
                     }
                     .disabled(tripName.isEmpty || endDate < startDate)
-                    .bold()
                 }
             }
         }
     }
-    
-    private func createTrip() {
-        let trip = Trip(
-            name: tripName,
-            startDate: startDate,
-            endDate: endDate,
-            days: [] // Empty array of days initially
-        )
-        viewModel.addTrip(trip)
-        newTrip = trip
-    }
-}
-
-struct AddTripView_Previews: PreviewProvider {
-    static var previews: some View {
-        AddTripView(viewModel: TripViewModel())
-    }
-}
+} 
