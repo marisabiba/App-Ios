@@ -203,12 +203,16 @@ struct ActivitiesSection: View {
     let activities: [Activity]
     let onAddActivity: () -> Void
     
+    var sortedActivities: [Activity] {
+        activities.sorted { $0.time < $1.time }
+    }
+    
     var body: some View {
         VStack(alignment: .leading) {
             Text("Activities (\(activities.count))")
                 .font(.headline)
             
-            ForEach(activities) { activity in
+            ForEach(sortedActivities) { activity in
                 ActivityCard(activity: activity)
             }
             
