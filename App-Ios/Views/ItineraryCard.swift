@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ItineraryCard: View {
-    var day: Day
+    var day: TripDay
     var onTap: () -> Void
 
     var body: some View {
@@ -11,16 +11,10 @@ struct ItineraryCard: View {
                 .padding(.bottom, 5)
             
             ForEach(day.activities) { activity in
-                Text(activity.name)
+                Text(activity.title)
             }
             
-            ForEach(day.accommodations) { accommodation in
-                Text(accommodation.name)
-            }
-            
-            ForEach(day.transportation) { transport in
-                Text(transport.type)
-            }
+            Text(day.transportationDetails.mode)
         }
         .padding()
         .background(Color.white)
@@ -41,11 +35,13 @@ let dateFormatter: DateFormatter = {
 
 struct ItineraryCard_Previews: PreviewProvider {
     static var previews: some View {
-        let mockDay = Day(
+        let mockDay = TripDay(
             date: Date(),
-            activities: [Activity(name: "Visit Museum")],
-            accommodations: [Accommodation(name: "Hotel ABC")],
-            transportation: [Transportation(type: "Bus")]
+            title: "Day 1",
+            activities: [Activity(time: Date(), title: "Visit Museum", location: "City Center", notes: "")],
+            transportationDetails: TransportationDetails(mode: "Bus", time: Date()),
+            budgetDetails: BudgetDetails(amount: 100),
+            checklist: []
         )
         
         return ItineraryCard(day: mockDay) {

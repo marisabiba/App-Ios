@@ -1,6 +1,1 @@
-import Foundation
-
-struct Activity: Identifiable {
-    var id = UUID()
-    var name: String
-}
+// Delete this file as Activity is already defined in Trip.swift

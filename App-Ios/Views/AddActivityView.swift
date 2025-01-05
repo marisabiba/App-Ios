@@ -1,3 +1,5 @@
+import SwiftUI
+
 struct AddActivityView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var viewModel: TripViewModel

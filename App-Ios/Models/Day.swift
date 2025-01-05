@@ -1,9 +1,1 @@
-import Foundation
-
-struct Day: Identifiable {
-    var id = UUID()
-    var date: Date
-    var activities: [Activity]
-    var accommodations: [Accommodation]
-    var transportation: [Transportation]
-}
+// Delete this file as we're using TripDay from Trip.swift

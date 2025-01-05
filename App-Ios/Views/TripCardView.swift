@@ -43,9 +43,21 @@ struct TripCardView: View {
 
 struct TripCardView_Previews: PreviewProvider {
     static var previews: some View {
-        let sampleTrip = Trip(name: "Sample Trip", 
-                            startDate: Date(), 
-                            endDate: Date().addingTimeInterval(86400 * 3))
+        let sampleTrip = Trip(
+            name: "Sample Trip", 
+            startDate: Date(), 
+            endDate: Date().addingTimeInterval(86400 * 3),
+            days: [
+                TripDay(
+                    date: Date(),
+                    title: "Day 1",
+                    activities: [],
+                    transportationDetails: TransportationDetails(mode: "", time: Date()),
+                    budgetDetails: BudgetDetails(amount: 0),
+                    checklist: []
+                )
+            ]
+        )
         
         TripCardView(trip: sampleTrip)
             .previewLayout(.sizeThatFits)

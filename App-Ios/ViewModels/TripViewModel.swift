@@ -58,11 +58,54 @@ final class TripViewModel: ObservableObject {
 
     func updateTrip(id: UUID, name: String, startDate: Date, endDate: Date) {
         if let index = trips.firstIndex(where: { $0.id == id }) {
-            trips[index] = Trip(id: id, name: name, startDate: startDate, endDate: endDate)
+            // Create an array of TripDays based on the date range
+            let calendar = Calendar.current
+            let numberOfDays = calendar.dateComponents([.day], from: startDate, to: endDate).day ?? 0 + 1
+            
+            var days: [TripDay] = []
+            for dayOffset in 0..<numberOfDays {
+                if let date = calendar.date(byAdding: .day, value: dayOffset, to: startDate) {
+                    let tripDay = TripDay(
+                        date: date,
+                        title: "Day \(dayOffset + 1)",
+                        activities: [],
+                        transportationDetails: TransportationDetails(mode: "", time: date),
+                        budgetDetails: BudgetDetails(amount: 0),
+                        checklist: []
+                    )
+                    days.append(tripDay)
+                }
+            }
+            
+            trips[index] = Trip(
+                id: id,
+                name: name,
+                startDate: startDate,
+                endDate: endDate,
+                days: days
+            )
         }
     }
 
     func deleteTrip(id: UUID) {
         trips.removeAll { $0.id == id }
+    }
+
+    func updateDayTitle(tripId: UUID, dayIndex: Int, newTitle: String) {
+        if let tripIndex = trips.firstIndex(where: { $0.id == tripId }) {
+            trips[tripIndex].days[dayIndex].title = newTitle
+        }
+    }
+
+    func updateTransportation(tripId: UUID, dayIndex: Int, transportation: TransportationDetails) {
+        if let tripIndex = trips.firstIndex(where: { $0.id == tripId }) {
+            trips[tripIndex].days[dayIndex].transportationDetails = transportation
+        }
+    }
+
+    func updateBudget(tripId: UUID, dayIndex: Int, budget: BudgetDetails) {
+        if let tripIndex = trips.firstIndex(where: { $0.id == tripId }) {
+            trips[tripIndex].days[dayIndex].budgetDetails = budget
+        }
     }
 }

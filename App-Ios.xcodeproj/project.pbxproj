@@ -20,6 +20,7 @@
 		A372F7B32D29D0D2002ADD73 /* Transportation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A372F7B22D29D0D2002ADD73 /* Transportation.swift */; };
 		A372F7B52D29D13E002ADD73 /* AddTripButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A372F7B42D29D13E002ADD73 /* AddTripButton.swift */; };
 		A372F7B72D29D18B002ADD73 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A372F7B62D29D18B002ADD73 /* MainView.swift */; };
+		A3D3C7122D2B001B00019779 /* AddActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3D3C7112D2B001B00019779 /* AddActivityView.swift */; };
 		A3E902302D2996EC00F0E6F1 /* App_IosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3E9022F2D2996EC00F0E6F1 /* App_IosApp.swift */; };
 		A3E902322D2996EC00F0E6F1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3E902312D2996EC00F0E6F1 /* ContentView.swift */; };
 		A3E902342D2996EE00F0E6F1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A3E902332D2996EE00F0E6F1 /* Assets.xcassets */; };
@@ -40,6 +41,7 @@
 		A372F7B22D29D0D2002ADD73 /* Transportation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transportation.swift; sourceTree = "<group>"; };
 		A372F7B42D29D13E002ADD73 /* AddTripButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTripButton.swift; sourceTree = "<group>"; };
 		A372F7B62D29D18B002ADD73 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		A3D3C7112D2B001B00019779 /* AddActivityView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddActivityView.swift; sourceTree = "<group>"; };
 		A3E9022C2D2996EC00F0E6F1 /* App-Ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "App-Ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3E9022F2D2996EC00F0E6F1 /* App_IosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App_IosApp.swift; sourceTree = "<group>"; };
 		A3E902312D2996EC00F0E6F1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -61,11 +63,11 @@
 		A372F7A32D29CD4A002ADD73 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				A372F7A62D29CD98002ADD73 /* Trip.swift */,
-				A372F7AC2D29D052002ADD73 /* Day.swift */,
-				A372F7AE2D29D087002ADD73 /* Activity.swift */,
 				A372F7B02D29D0B1002ADD73 /* Accommodation.swift */,
+				A372F7AE2D29D087002ADD73 /* Activity.swift */,
+				A372F7AC2D29D052002ADD73 /* Day.swift */,
 				A372F7B22D29D0D2002ADD73 /* Transportation.swift */,
+				A372F7A62D29CD98002ADD73 /* Trip.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -81,11 +83,12 @@
 		A372F7A52D29CD7C002ADD73 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				A372F7AA2D29CF67002ADD73 /* ItineraryCard.swift */,
+				A3D3C7112D2B001B00019779 /* AddActivityView.swift */,
 				A372F7B42D29D13E002ADD73 /* AddTripButton.swift */,
-				A372F7B62D29D18B002ADD73 /* MainView.swift */,
-				A3711AC32D29F94600BCCC7F /* ItineraryView.swift */,
 				A3711AC52D29FAD900BCCC7F /* AddTripView.swift */,
+				A372F7AA2D29CF67002ADD73 /* ItineraryCard.swift */,
+				A3711AC32D29F94600BCCC7F /* ItineraryView.swift */,
+				A372F7B62D29D18B002ADD73 /* MainView.swift */,
 				A3711AC72D29FB4E00BCCC7F /* TripCardView.swift */,
 				A3711AC92D2A028E00BCCC7F /* TripDetailsView.swift */,
 			);
@@ -111,13 +114,13 @@
 		A3E9022E2D2996EC00F0E6F1 /* App-Ios */ = {
 			isa = PBXGroup;
 			children = (
-				A372F7A52D29CD7C002ADD73 /* Views */,
-				A372F7A42D29CD6D002ADD73 /* ViewModels */,
-				A372F7A32D29CD4A002ADD73 /* Models */,
 				A3E9022F2D2996EC00F0E6F1 /* App_IosApp.swift */,
-				A3E902312D2996EC00F0E6F1 /* ContentView.swift */,
 				A3E902332D2996EE00F0E6F1 /* Assets.xcassets */,
+				A3E902312D2996EC00F0E6F1 /* ContentView.swift */,
+				A372F7A32D29CD4A002ADD73 /* Models */,
 				A3E902352D2996EE00F0E6F1 /* Preview Content */,
+				A372F7A42D29CD6D002ADD73 /* ViewModels */,
+				A372F7A52D29CD7C002ADD73 /* Views */,
 			);
 			path = "App-Ios";
 			sourceTree = "<group>";
@@ -201,6 +204,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A3711AC62D29FAD900BCCC7F /* AddTripView.swift in Sources */,
+				A3D3C7122D2B001B00019779 /* AddActivityView.swift in Sources */,
 				A372F7AF2D29D087002ADD73 /* Activity.swift in Sources */,
 				A372F7A72D29CD98002ADD73 /* Trip.swift in Sources */,
 				A3E902322D2996EC00F0E6F1 /* ContentView.swift in Sources */,
