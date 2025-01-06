@@ -5,57 +5,84 @@ struct TripCardView: View {
     @State private var backgroundImage: String? = nil
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(trip.name)
-                .font(.headline)
-                .foregroundColor(.white)
+        VStack(alignment: .leading, spacing: 4) {
+            Spacer() // Push content to bottom half
             
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("Start:")
-                        .font(.subheadline)
+            // Location info
+            VStack(alignment: .leading, spacing: 2) {
+                // Split the trip name into main location and country
+                let components = trip.name.components(separatedBy: ", ")
+                if components.count > 1 {
+                    Text(components[0]) // City/State
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(.white)
+                    Text(components[1...].joined(separator: ", ")) // Country
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.white.opacity(0.8))
+                } else {
+                    Text(trip.name)
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(.white)
+                }
+            }
+            
+            // Dates
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Start")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.white.opacity(0.7))
                     Text(formattedDate(trip.startDate))
-                        .font(.subheadline)
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(.white)
                 }
                 
                 Spacer()
                 
-                VStack(alignment: .leading) {
-                    Text("End:")
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.8))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("End")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.white.opacity(0.7))
                     Text(formattedDate(trip.endDate))
-                        .font(.subheadline)
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(.white)
                 }
             }
+            .padding(.top, 8)
         }
-        .padding()
-        .frame(height: 150)
+        .padding(20)
+        .frame(height: 200)
         .frame(maxWidth: .infinity)
         .background(
-            Group {
-                if let imageUrl = backgroundImage {
-                    AsyncImage(url: URL(string: imageUrl)) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    } placeholder: {
+            ZStack {
+                // Background image
+                Group {
+                    if let imageUrl = backgroundImage {
+                        AsyncImage(url: URL(string: imageUrl)) { image in
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        } placeholder: {
+                            Color.gray
+                        }
+                    } else {
                         Color.gray
                     }
-                } else {
-                    Color.gray
                 }
+                
+                // Gradient overlay
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        .clear,
+                        .black.opacity(0.3),
+                        .black.opacity(0.7)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
             }
         )
-        .clipped()
-        .overlay(
-            Color.black.opacity(0.3) // Adds a dark overlay for better text visibility
-        )
-        .cornerRadius(10)
-        .shadow(radius: 2)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
         .onAppear {
             loadBackgroundImage()
         }
@@ -94,8 +121,8 @@ struct TripCardView: View {
 struct TripCardView_Previews: PreviewProvider {
     static var previews: some View {
         let sampleTrip = Trip(
-            name: "Barcelona", 
-            startDate: Date(), 
+            name: "Florida, United States",
+            startDate: Date(),
             endDate: Date().addingTimeInterval(86400 * 3),
             days: [
                 TripDay(

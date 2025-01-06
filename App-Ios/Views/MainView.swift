@@ -6,13 +6,16 @@ struct MainView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(tripViewModel.trips) { trip in
-                    NavigationLink(destination: TripDetailsView(viewModel: tripViewModel, trip: trip)) {
-                        TripCardView(trip: trip)
+            ScrollView {
+                VStack(spacing: 16) {
+                    ForEach(tripViewModel.trips) { trip in
+                        NavigationLink(destination: TripDetailsView(viewModel: tripViewModel, trip: trip)) {
+                            TripCardView(trip: trip)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
-                    .padding(.vertical, 5)
                 }
+                .padding(16)
             }
             .navigationTitle("Trips")
             .toolbar {

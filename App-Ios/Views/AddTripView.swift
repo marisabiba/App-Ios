@@ -15,8 +15,8 @@ struct AddTripView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Trip Details")) {
-                    TextField("Trip Name", text: $tripName)
+                Section() {
+                    TextField("Destination", text: $tripName)
                         .onChange(of: tripName) { newValue in
                             if !newValue.isEmpty {
                                 fetchSuggestions(for: newValue)
