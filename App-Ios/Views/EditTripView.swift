@@ -20,8 +20,8 @@ struct EditTripView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Trip Details")) {
-                    TextField("Trip Name", text: $tripName)
+                Section() {
+                    TextField("Destination", text: $tripName)
                     DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
                     DatePicker("End Date", selection: $endDate, displayedComponents: .date)
                 }
