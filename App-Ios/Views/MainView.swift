@@ -57,19 +57,24 @@ struct MainView: View {
 
         return ScrollView {
             VStack(spacing: 16) {
-                ForEach(upcomingTrips) { trip in
-                    VStack(alignment: .leading, spacing: 4) {
-                        if trip.startDate <= now && trip.endDate >= now {
-                            Text("Current")
-                                .font(.headline)
-                                .foregroundColor(.red)
-                        }
-                        NavigationLink(destination: TripDetailsView(viewModel: tripViewModel, trip: trip)) {
-                            TripCardView(trip: trip)
-                        }
-                        .buttonStyle(.plain)
-                    }
+            ForEach(upcomingTrips) { trip in
+                ZStack(alignment: .topLeading) {
+                if trip.startDate <= now && trip.endDate >= now {
+                    Text("Current")
+                    .font(.headline)
+                    .foregroundColor(.red)
+                    .padding(8)
+                    .background(Color.white)
+                    .cornerRadius(12)
+                    .padding([.top, .leading], 8)
+                    .zIndex(1)
                 }
+                NavigationLink(destination: TripDetailsView(viewModel: tripViewModel, trip: trip)) {
+                    TripCardView(trip: trip)
+                }
+                .buttonStyle(.plain)
+                }
+            }
             }
             .padding()
         }
