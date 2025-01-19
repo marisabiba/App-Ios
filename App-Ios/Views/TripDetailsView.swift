@@ -217,9 +217,19 @@ struct ActivitiesSection: View {
             }
             
             Button(action: onAddActivity) {
-                Label("Add Activity", systemImage: "plus.circle.fill")
+                HStack {
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundColor(.blue)
+                    Text("Add Activity")
+                        .fontWeight(.semibold)
+                        .foregroundColor(.blue)
+                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(8)
             }
         }
+        .padding(.top)
     }
 }
 
@@ -237,20 +247,79 @@ struct TransportationSection: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Transportation")
                 .font(.headline)
+                .padding(.horizontal)
             
-            TextField("Mode of transport", text: $mode)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .onChange(of: mode) { newValue in
-                    onUpdate(TransportationDetails(mode: newValue, time: time))
+            HStack(spacing: 4) {
+                Button(action: {
+                    mode = "Bus"
+                    onUpdate(TransportationDetails(mode: "Bus", time: time))
+                }) {
+                    HStack {
+                        Image(systemName: "bus")
+                            .foregroundColor(.black)
+                        Text("Bus")
+                            .foregroundColor(.black)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+.background(mode == "Bus" ? Color(.secondarySystemBackground) : Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.gray, lineWidth: 1)
+                    )
+                    .cornerRadius(8)
                 }
+                
+                Button(action: {
+                    mode = "Metro"
+                    onUpdate(TransportationDetails(mode: "Metro", time: time))
+                }) {
+                    HStack {
+                        Image(systemName: "tram")
+                            .foregroundColor(.black)
+                        Text("Metro")
+                            .foregroundColor(.black)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+.background(mode == "Metro" ? Color(.secondarySystemBackground) : Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.gray, lineWidth: 1)
+                    )
+                    .cornerRadius(8)
+                }
+                
+                Button(action: {
+                    mode = "Walk"
+                    onUpdate(TransportationDetails(mode: "Walk", time: time))
+                }) {
+                    HStack {
+                        Image(systemName: "figure.walk")
+                            .foregroundColor(.black)
+                        Text("Walk")
+                            .foregroundColor(.black)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+.background(mode == "Walk" ? Color(.secondarySystemBackground) : Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.gray, lineWidth: 1)
+                    )
+                    .cornerRadius(8)
+                }
+            }
+            .padding(.horizontal)
             
             DatePicker("Time", selection: $time, displayedComponents: .hourAndMinute)
                 .onChange(of: time) { newValue in
                     onUpdate(TransportationDetails(mode: mode, time: newValue))
                 }
+                .padding(.horizontal)
         }
     }
 }
@@ -290,22 +359,26 @@ struct ActivityCard: View {
     let activity: Activity
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Text(activity.title)
-                .font(.headline)
-            Text(activity.location)
-                .font(.subheadline)
-            if !activity.notes.isEmpty {
-                Text(activity.notes)
-                    .font(.caption)
+        HStack {
+            VStack(alignment: .leading) {
+                Text(activity.title)
+                    .font(.headline)
+                Text(activity.time, style: .time)
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
             }
-            Text(activity.time.formatted(date: .omitted, time: .shortened))
-                .font(.caption)
+            Spacer()
+            Image(systemName: "chevron.right")
                 .foregroundColor(.gray)
         }
         .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(8)
+    .background(Color(.systemBackground))
+    .overlay(
+        RoundedRectangle(cornerRadius: 10)
+            .stroke(Color.gray, lineWidth: 1)
+    )
+    .cornerRadius(10)
+    .padding(.vertical, 4)
     }
 }
 
@@ -313,15 +386,28 @@ struct ChecklistSection: View {
     let checklist: [ChecklistItem]
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Checklist")
-                .font(.headline)
+                .font(.title2)
+                .fontWeight(.bold)
             ForEach(checklist) { item in
                 HStack {
-                    Image(systemName: item.isCompleted ? "checkmark.square" : "square")
+                    Image(systemName: item.isCompleted ? "checkmark.square.fill" : "square")
                     Text(item.title)
+                        .font(.body)
                 }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color(.systemGray6))
+                )
             }
         }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white)
+                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 4)
+        )
     }
 }
