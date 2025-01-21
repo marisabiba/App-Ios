@@ -56,7 +56,7 @@ struct ItineraryCard_Previews: PreviewProvider {
             title: "Day 1",
             activities: [sampleActivity],
             transportationDetails: TransportationDetails(mode: "Bus", time: Date()),
-            budgetDetails: BudgetDetails(totalBudget: 100, expenses: []),
+            budgetDetails: BudgetDetails(totalBudget: 100, expenses: [], currency: "EUR"),
             checklist: []
         )
         

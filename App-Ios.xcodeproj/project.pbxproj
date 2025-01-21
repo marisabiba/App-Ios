@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6D0CD9E52D3FBF0E00FE6F66 /* CurrencyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0CD9E42D3FBF0E00FE6F66 /* CurrencyService.swift */; };
+		6D0CD9E92D3FC33300FE6F66 /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0CD9E82D3FC33300FE6F66 /* APIConfig.swift */; };
+		6DF1DC932D3FBA8F00FDB264 /* AddExpenseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF1DC922D3FBA8F00FDB264 /* AddExpenseView.swift */; };
 		A3711AC22D29F8C200BCCC7F /* TripViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3711AC12D29F8C200BCCC7F /* TripViewModel.swift */; };
 		A3711AC42D29F94600BCCC7F /* ItineraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3711AC32D29F94600BCCC7F /* ItineraryView.swift */; };
 		A3711AC62D29FAD900BCCC7F /* AddTripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3711AC52D29FAD900BCCC7F /* AddTripView.swift */; };
@@ -29,6 +32,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6D0CD9E42D3FBF0E00FE6F66 /* CurrencyService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrencyService.swift; sourceTree = "<group>"; };
+		6D0CD9E82D3FC33300FE6F66 /* APIConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
+		6DF1DC922D3FBA8F00FDB264 /* AddExpenseView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddExpenseView.swift; sourceTree = "<group>"; };
 		A3711AC12D29F8C200BCCC7F /* TripViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripViewModel.swift; sourceTree = "<group>"; };
 		A3711AC32D29F94600BCCC7F /* ItineraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItineraryView.swift; sourceTree = "<group>"; };
 		A3711AC52D29FAD900BCCC7F /* AddTripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTripView.swift; sourceTree = "<group>"; };
@@ -62,6 +68,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6D0CD9E32D3FBF0E00FE6F66 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				6D0CD9E42D3FBF0E00FE6F66 /* CurrencyService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		6D0CD9E72D3FC33300FE6F66 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				6D0CD9E82D3FC33300FE6F66 /* APIConfig.swift */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
 		A372F7A32D29CD4A002ADD73 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -85,6 +107,7 @@
 		A372F7A52D29CD7C002ADD73 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				6DF1DC922D3FBA8F00FDB264 /* AddExpenseView.swift */,
 				A3D3C7112D2B001B00019779 /* AddActivityView.swift */,
 				A372F7B42D29D13E002ADD73 /* AddTripButton.swift */,
 				A3711AC52D29FAD900BCCC7F /* AddTripView.swift */,
@@ -117,6 +140,8 @@
 		A3E9022E2D2996EC00F0E6F1 /* App-Ios */ = {
 			isa = PBXGroup;
 			children = (
+				6D0CD9E72D3FC33300FE6F66 /* Config */,
+				6D0CD9E32D3FBF0E00FE6F66 /* Services */,
 				A3E9022F2D2996EC00F0E6F1 /* App_IosApp.swift */,
 				A3E902332D2996EE00F0E6F1 /* Assets.xcassets */,
 				A3E902312D2996EC00F0E6F1 /* ContentView.swift */,
@@ -215,9 +240,12 @@
 				A372F7B72D29D18B002ADD73 /* MainView.swift in Sources */,
 				A3E902302D2996EC00F0E6F1 /* App_IosApp.swift in Sources */,
 				A372F7AD2D29D052002ADD73 /* Day.swift in Sources */,
+				6DF1DC932D3FBA8F00FDB264 /* AddExpenseView.swift in Sources */,
+				6D0CD9E52D3FBF0E00FE6F66 /* CurrencyService.swift in Sources */,
 				A372F7AB2D29CF67002ADD73 /* ItineraryCard.swift in Sources */,
 				A3711ACA2D2A028E00BCCC7F /* TripDetailsView.swift in Sources */,
 				A372F7B12D29D0B1002ADD73 /* Accommodation.swift in Sources */,
+				6D0CD9E92D3FC33300FE6F66 /* APIConfig.swift in Sources */,
 				A3711AC42D29F94600BCCC7F /* ItineraryView.swift in Sources */,
 				A372F7B32D29D0D2002ADD73 /* Transportation.swift in Sources */,
 				A3711AC22D29F8C200BCCC7F /* TripViewModel.swift in Sources */,

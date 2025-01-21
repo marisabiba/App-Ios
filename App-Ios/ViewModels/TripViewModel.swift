@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 final class TripViewModel: ObservableObject {
     @Published var trips: [Trip] = [] {
@@ -30,7 +31,7 @@ final class TripViewModel: ObservableObject {
                     title: formatDayTitle(date),
                     activities: [],
                     transportationDetails: TransportationDetails(mode: "", time: date),
-                    budgetDetails: BudgetDetails(totalBudget: 0, expenses: []),
+                    budgetDetails: BudgetDetails(totalBudget: 0, expenses: [], currency: trip.localCurrency),
                     checklist: []
                 )
                 days.append(day)
@@ -87,7 +88,7 @@ final class TripViewModel: ObservableObject {
                             title: formatDayTitle(date),
                             activities: [],
                             transportationDetails: TransportationDetails(mode: "", time: date),
-                            budgetDetails: BudgetDetails(totalBudget: 0, expenses: []),
+                            budgetDetails: BudgetDetails(totalBudget: 0, expenses: [], currency: trips[index].localCurrency),
                             checklist: []
                         )
                         days.append(newDay)
@@ -96,13 +97,13 @@ final class TripViewModel: ObservableObject {
             }
             
             // Update the trip with new information
-            trips[index] = Trip(
-                id: id,
-                name: name,
-                startDate: startDate,
-                endDate: endDate,
-                days: days
-            )
+            var updatedTrip = trips[index]
+            updatedTrip.name = name
+            updatedTrip.startDate = startDate
+            updatedTrip.endDate = endDate
+            updatedTrip.days = days
+            
+            trips[index] = updatedTrip
         }
     }
 
@@ -133,5 +134,50 @@ final class TripViewModel: ObservableObject {
         if let tripIndex = trips.firstIndex(where: { $0.id == tripId }) {
             trips[tripIndex].days[dayIndex].budgetDetails = budget
         }
+    }
+
+    func updateExpenseWithConversion(_ expense: BudgetExpense, tripId: UUID, dayIndex: Int) async {
+        // If the currencies are the same, no conversion needed
+        guard let tripIndex = trips.firstIndex(where: { $0.id == tripId }),
+              expense.currency != trips[tripIndex].days[dayIndex].budgetDetails.currency else {
+            return
+        }
+        
+        do {
+            let currencyService = CurrencyService()
+            let convertedAmount = try await currencyService.convertCurrency(
+                amount: expense.amount,
+                from: expense.currency,
+                to: trips[tripIndex].days[dayIndex].budgetDetails.currency
+            )
+            
+            // Update the expense with the converted amount
+            DispatchQueue.main.async {
+                var updatedTrip = self.trips[tripIndex]
+                var updatedExpense = expense
+                updatedExpense.amount = convertedAmount
+                updatedExpense.currency = updatedTrip.days[dayIndex].budgetDetails.currency
+                updatedTrip.days[dayIndex].budgetDetails.expenses.append(updatedExpense)
+                self.trips[tripIndex] = updatedTrip
+            }
+        } catch {
+            print("Currency conversion failed: \(error)")
+        }
+    }
+    
+    func getTotalBudgetInLocalCurrency(for trip: Trip) async -> Double {
+        var total = 0.0
+        
+        for day in trip.days {
+            for expense in day.budgetDetails.expenses {
+                if expense.currency == trip.localCurrency {
+                    total += expense.amount
+                } else if let convertedAmount = expense.convertedAmount {
+                    total += convertedAmount
+                }
+            }
+        }
+        
+        return total
     }
 }

@@ -7,6 +7,7 @@ struct TripDetailsView: View {
     @State private var showingEditSheet = false
     @Environment(\.dismiss) var dismiss
     let trip: Trip
+    @State private var dayIndex: Int = 0
     
     var body: some View {
         VStack(spacing: 0) {
@@ -162,14 +163,18 @@ struct DayPlanView: View {
                     
                     // Budget Details
                     BudgetSection(
-                        budget: trip.days[dayIndex].budgetDetails
-                    ) { newBudget in
-                        viewModel.updateBudget(
-                            tripId: trip.id,
-                            dayIndex: dayIndex,
-                            budget: newBudget
-                        )
-                    }
+                        budget: trip.days[dayIndex].budgetDetails,
+                        trip: trip,
+                        viewModel: viewModel,
+                        dayIndex: dayIndex,
+                        onUpdate: { newBudget in
+                            viewModel.updateBudget(
+                                tripId: trip.id,
+                                dayIndex: dayIndex,
+                                budget: newBudget
+                            )
+                        }
+                    )
                 }
             }
             .padding()
@@ -326,12 +331,18 @@ struct TransportationSection: View {
 
 struct BudgetSection: View {
     let budget: BudgetDetails
+    let trip: Trip
+    let viewModel: TripViewModel
+    let dayIndex: Int
     let onUpdate: (BudgetDetails) -> Void
     @State private var showingAddExpense = false
     @State private var totalBudget: String
     
-    init(budget: BudgetDetails, onUpdate: @escaping (BudgetDetails) -> Void) {
+    init(budget: BudgetDetails, trip: Trip, viewModel: TripViewModel, dayIndex: Int, onUpdate: @escaping (BudgetDetails) -> Void) {
         self.budget = budget
+        self.trip = trip
+        self.viewModel = viewModel
+        self.dayIndex = dayIndex
         self.onUpdate = onUpdate
         _totalBudget = State(initialValue: String(format: "%.2f", budget.totalBudget))
     }
@@ -357,6 +368,27 @@ struct BudgetSection: View {
                         }
                 }
                 .frame(maxWidth: .infinity)
+            }
+            
+            // Budget Overview
+            VStack(spacing: 12) {
+                ForEach(budget.expenses) { expense in
+                    HStack {
+                        Image(systemName: expense.category.icon)
+                            .foregroundColor(expense.category.color)
+                        Text(expense.note)
+                        Spacer()
+                        VStack(alignment: .trailing) {
+                            Text("\(expense.amount, format: .currency(code: expense.currency))")
+                            if let converted = expense.convertedAmount,
+                               expense.currency != trip.localCurrency {
+                                Text("\(converted, format: .currency(code: trip.localCurrency))")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+                }
             }
             
             // Budget Overview
@@ -415,84 +447,13 @@ struct BudgetSection: View {
             }
         }
         .sheet(isPresented: $showingAddExpense) {
-            AddExpenseView(budget: budget, onUpdate: onUpdate)
-        }
-    }
-}
-
-struct AddExpenseView: View {
-    @Environment(\.dismiss) var dismiss
-    let budget: BudgetDetails
-    let onUpdate: (BudgetDetails) -> Void
-    
-    @State private var selectedCategory: BudgetCategory = .other
-    @State private var amount = ""
-    @State private var note = ""
-    @FocusState private var isAmountFocused: Bool
-    
-    var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Expense Details")) {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Picker("Category", selection: $selectedCategory) {
-                            ForEach(BudgetCategory.allCases, id: \.self) { category in
-                                Label(
-                                    title: { Text(category.rawValue) },
-                                    icon: { Image(systemName: category.icon) }
-                                )
-                                .foregroundColor(category.color)
-                                .tag(category)
-                            }
-                        }
-                        .pickerStyle(.menu)
-                        
-                        HStack {
-                            Text("$")
-                            TextField("Amount", text: $amount)
-                                .keyboardType(.decimalPad)
-                                .focused($isAmountFocused)
-                                .toolbar {
-                                    ToolbarItemGroup(placement: .keyboard) {
-                                        Spacer()
-                                        Button("Done") {
-                                            isAmountFocused = false
-                                        }
-                                    }
-                                }
-                        }
-                        
-                        TextField("Note", text: $note)
-                            .textFieldStyle(.roundedBorder)
-                    }
-                    .listRowInsets(EdgeInsets())
-                    .padding()
-                }
-            }
-            .navigationTitle("Add Expense")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-                
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") {
-                        if let amountValue = Double(amount), amountValue > 0 {
-                            var updatedBudget = budget
-                            let newExpense = BudgetExpense(
-                                category: selectedCategory,
-                                amount: amountValue,
-                                note: note
-                            )
-                            updatedBudget.expenses.append(newExpense)
-                            onUpdate(updatedBudget)
-                            dismiss()
-                        }
-                    }
-                    .disabled(Double(amount) == nil || amount.isEmpty)
-                }
-            }
+            AddExpenseView(
+                viewModel: viewModel,
+                trip: trip,
+                dayIndex: dayIndex,
+                budget: budget,
+                onUpdate: onUpdate
+            )
         }
     }
 }
@@ -560,5 +521,19 @@ struct ChecklistSection: View {
                 .fill(Color.white)
                 .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 4)
         )
+    }
+}
+
+struct TripDetailsView_Previews: PreviewProvider {
+    static var previews: some View {
+        let viewModel = TripViewModel()
+        let sampleTrip = Trip(
+            name: "Sample Trip",
+            startDate: Date(),
+            endDate: Date().addingTimeInterval(86400),
+            days: [],
+            localCurrency: "USD"
+        )
+        TripDetailsView(viewModel: viewModel, trip: sampleTrip)
     }
 }

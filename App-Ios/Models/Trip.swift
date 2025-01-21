@@ -7,7 +7,16 @@ struct Trip: Identifiable, Codable {
     var startDate: Date
     var endDate: Date
     var days: [TripDay]
+    var localCurrency: String // e.g., "USD", "EUR", "JPY"
     
+    init(name: String, startDate: Date, endDate: Date, days: [TripDay], localCurrency: String = "USD") {
+        self.id = UUID()
+        self.name = name
+        self.startDate = startDate
+        self.endDate = endDate
+        self.days = days
+        self.localCurrency = localCurrency
+    }
     
     var numberOfDays: Int {
         let calendar = Calendar.current
@@ -45,6 +54,7 @@ struct TransportationDetails: Codable {
 struct BudgetDetails: Codable {
     var totalBudget: Double
     var expenses: [BudgetExpense]
+    var currency: String // Base currency (e.g., "USD")
     
     var remainingBudget: Double {
         totalBudget - expenses.reduce(0) { $0 + $1.amount }
@@ -127,4 +137,6 @@ struct BudgetExpense: Identifiable, Codable {
     var category: BudgetCategory
     var amount: Double
     var note: String
+    var currency: String // The currency in which the expense was made
+    var convertedAmount: Double? // Amount converted to trip's local currency
 }

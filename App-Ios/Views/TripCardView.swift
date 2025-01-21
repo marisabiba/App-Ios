@@ -125,16 +125,16 @@ struct TripCardView_Previews: PreviewProvider {
             title: "Day 1",
             activities: [],
             transportationDetails: TransportationDetails(mode: "Bus", time: Date()),
-            budgetDetails: BudgetDetails(totalBudget: 100, expenses: []),
+            budgetDetails: BudgetDetails(totalBudget: 100, expenses: [], currency: "USD"),
             checklist: []
         )
         
         let sampleTrip = Trip(
-            id: UUID(),
             name: "Paris, France",
             startDate: Date(),
             endDate: Date().addingTimeInterval(86400 * 3),
-            days: [sampleDay]
+            days: [sampleDay],
+            localCurrency: "USD"
         )
         
         return TripCardView(trip: sampleTrip)
