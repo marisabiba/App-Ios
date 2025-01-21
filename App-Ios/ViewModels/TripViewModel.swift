@@ -30,7 +30,7 @@ final class TripViewModel: ObservableObject {
                     title: formatDayTitle(date),
                     activities: [],
                     transportationDetails: TransportationDetails(mode: "", time: date),
-                    budgetDetails: BudgetDetails(amount: 0),
+                    budgetDetails: BudgetDetails(totalBudget: 0, expenses: []),
                     checklist: []
                 )
                 days.append(day)
@@ -87,7 +87,7 @@ final class TripViewModel: ObservableObject {
                             title: formatDayTitle(date),
                             activities: [],
                             transportationDetails: TransportationDetails(mode: "", time: date),
-                            budgetDetails: BudgetDetails(amount: 0),
+                            budgetDetails: BudgetDetails(totalBudget: 0, expenses: []),
                             checklist: []
                         )
                         days.append(newDay)

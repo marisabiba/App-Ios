@@ -327,29 +327,171 @@ struct TransportationSection: View {
 struct BudgetSection: View {
     let budget: BudgetDetails
     let onUpdate: (BudgetDetails) -> Void
-    @State private var amount: String
+    @State private var showingAddExpense = false
+    @State private var totalBudget: String
     
     init(budget: BudgetDetails, onUpdate: @escaping (BudgetDetails) -> Void) {
         self.budget = budget
         self.onUpdate = onUpdate
-        _amount = State(initialValue: String(format: "%.2f", budget.amount))
+        _totalBudget = State(initialValue: String(format: "%.2f", budget.totalBudget))
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Budget")
-                .font(.headline)
+        VStack(alignment: .leading, spacing: 16) {
+            // Total Budget Section
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Total Budget")
+                    .font(.headline)
+                
+                HStack {
+                    Text("$")
+                    TextField("Total Budget", text: $totalBudget)
+                        .keyboardType(.decimalPad)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .onChange(of: totalBudget) { newValue in
+                            if let newAmount = Double(newValue) {
+                                var updatedBudget = budget
+                                updatedBudget.totalBudget = newAmount
+                                onUpdate(updatedBudget)
+                            }
+                        }
+                }
+                .frame(maxWidth: .infinity)
+            }
             
-            HStack {
-                Text("$")
-                TextField("Amount", text: $amount)
-                    .keyboardType(.decimalPad)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .onChange(of: amount) { newValue in
-                        if let newAmount = Double(newValue) {
-                            onUpdate(BudgetDetails(amount: newAmount))
+            // Budget Overview
+            VStack(spacing: 12) {
+                HStack {
+                    Text("Remaining")
+                        .fontWeight(.medium)
+                    Spacer()
+                    Text("$\(String(format: "%.2f", budget.remainingBudget))")
+                        .foregroundColor(budget.remainingBudget >= 0 ? .green : .red)
+                        .fontWeight(.bold)
+                }
+                
+                Divider()
+                
+                // Expenses by Category
+                ScrollView {
+                    VStack(spacing: 8) {
+                        ForEach(BudgetCategory.allCases, id: \.self) { category in
+                            let amount = budget.expenses
+                                .filter { $0.category == category }
+                                .reduce(0) { $0 + $1.amount }
+                            
+                            if amount > 0 {
+                                HStack {
+                                    Image(systemName: category.icon)
+                                        .foregroundColor(category.color)
+                                        .frame(width: 24, height: 24)
+                                    Text(category.rawValue)
+                                    Spacer()
+                                    Text("$\(String(format: "%.2f", amount))")
+                                }
+                                .padding(.horizontal)
+                            }
                         }
                     }
+                }
+                .frame(maxHeight: 200)
+            }
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(10)
+            .shadow(radius: 2)
+            
+            // Add Expense Button
+            Button(action: { showingAddExpense = true }) {
+                HStack {
+                    Image(systemName: "plus.circle.fill")
+                    Text("Add Expense")
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+            }
+        }
+        .sheet(isPresented: $showingAddExpense) {
+            AddExpenseView(budget: budget, onUpdate: onUpdate)
+        }
+    }
+}
+
+struct AddExpenseView: View {
+    @Environment(\.dismiss) var dismiss
+    let budget: BudgetDetails
+    let onUpdate: (BudgetDetails) -> Void
+    
+    @State private var selectedCategory: BudgetCategory = .other
+    @State private var amount = ""
+    @State private var note = ""
+    @FocusState private var isAmountFocused: Bool
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Expense Details")) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Picker("Category", selection: $selectedCategory) {
+                            ForEach(BudgetCategory.allCases, id: \.self) { category in
+                                Label(
+                                    title: { Text(category.rawValue) },
+                                    icon: { Image(systemName: category.icon) }
+                                )
+                                .foregroundColor(category.color)
+                                .tag(category)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        
+                        HStack {
+                            Text("$")
+                            TextField("Amount", text: $amount)
+                                .keyboardType(.decimalPad)
+                                .focused($isAmountFocused)
+                                .toolbar {
+                                    ToolbarItemGroup(placement: .keyboard) {
+                                        Spacer()
+                                        Button("Done") {
+                                            isAmountFocused = false
+                                        }
+                                    }
+                                }
+                        }
+                        
+                        TextField("Note", text: $note)
+                            .textFieldStyle(.roundedBorder)
+                    }
+                    .listRowInsets(EdgeInsets())
+                    .padding()
+                }
+            }
+            .navigationTitle("Add Expense")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Add") {
+                        if let amountValue = Double(amount), amountValue > 0 {
+                            var updatedBudget = budget
+                            let newExpense = BudgetExpense(
+                                category: selectedCategory,
+                                amount: amountValue,
+                                note: note
+                            )
+                            updatedBudget.expenses.append(newExpense)
+                            onUpdate(updatedBudget)
+                            dismiss()
+                        }
+                    }
+                    .disabled(Double(amount) == nil || amount.isEmpty)
+                }
             }
         }
     }
@@ -360,6 +502,12 @@ struct ActivityCard: View {
     
     var body: some View {
         HStack {
+            Image(systemName: activity.category.icon)
+                .foregroundColor(.white)
+                .frame(width: 40, height: 40)
+                .background(activity.category.color)
+                .clipShape(Circle())
+            
             VStack(alignment: .leading) {
                 Text(activity.title)
                     .font(.headline)
@@ -367,18 +515,21 @@ struct ActivityCard: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
             }
+            .padding(.leading, 8)
+            
             Spacer()
+            
             Image(systemName: "chevron.right")
                 .foregroundColor(.gray)
         }
         .padding()
-    .background(Color(.systemBackground))
-    .overlay(
-        RoundedRectangle(cornerRadius: 10)
-            .stroke(Color.gray, lineWidth: 1)
-    )
-    .cornerRadius(10)
-    .padding(.vertical, 4)
+        .background(Color(.systemBackground))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.gray, lineWidth: 1)
+        )
+        .cornerRadius(10)
+        .padding(.vertical, 4)
     }
 }
 

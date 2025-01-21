@@ -11,7 +11,16 @@ struct ItineraryCard: View {
                 .padding(.bottom, 5)
             
             ForEach(day.activities) { activity in
-                Text(activity.title)
+                HStack {
+                    Image(systemName: activity.category.icon)
+                        .foregroundColor(.white)
+                        .frame(width: 30, height: 30)
+                        .background(activity.category.color)
+                        .clipShape(Circle())
+                    
+                    Text(activity.title)
+                        .padding(.leading, 8)
+                }
             }
             
             Text(day.transportationDetails.mode)
@@ -32,20 +41,27 @@ let dateFormatter: DateFormatter = {
     return formatter
 }()
 
-
 struct ItineraryCard_Previews: PreviewProvider {
     static var previews: some View {
-        let mockDay = TripDay(
+        let sampleActivity = Activity(
+            time: Date(),
+            title: "Visit Museum",
+            location: "City Center",
+            notes: "Buy tickets online",
+            category: .sightseeing
+        )
+        
+        let sampleDay = TripDay(
             date: Date(),
             title: "Day 1",
-            activities: [Activity(time: Date(), title: "Visit Museum", location: "City Center", notes: "")],
+            activities: [sampleActivity],
             transportationDetails: TransportationDetails(mode: "Bus", time: Date()),
-            budgetDetails: BudgetDetails(amount: 100),
+            budgetDetails: BudgetDetails(totalBudget: 100, expenses: []),
             checklist: []
         )
         
-        return ItineraryCard(day: mockDay) {
-            print("Card tapped!")
+        return ItineraryCard(day: sampleDay) {
+            print("Card tapped")
         }
         .previewLayout(.sizeThatFits)
         .padding()

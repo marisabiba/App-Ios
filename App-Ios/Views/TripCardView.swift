@@ -120,23 +120,24 @@ struct TripCardView: View {
 
 struct TripCardView_Previews: PreviewProvider {
     static var previews: some View {
-        let sampleTrip = Trip(
-            name: "Florida, United States",
-            startDate: Date(),
-            endDate: Date().addingTimeInterval(86400 * 3),
-            days: [
-                TripDay(
-                    date: Date(),
-                    title: "Day 1",
-                    activities: [],
-                    transportationDetails: TransportationDetails(mode: "", time: Date()),
-                    budgetDetails: BudgetDetails(amount: 0),
-                    checklist: []
-                )
-            ]
+        let sampleDay = TripDay(
+            date: Date(),
+            title: "Day 1",
+            activities: [],
+            transportationDetails: TransportationDetails(mode: "Bus", time: Date()),
+            budgetDetails: BudgetDetails(totalBudget: 100, expenses: []),
+            checklist: []
         )
         
-        TripCardView(trip: sampleTrip)
+        let sampleTrip = Trip(
+            id: UUID(),
+            name: "Paris, France",
+            startDate: Date(),
+            endDate: Date().addingTimeInterval(86400 * 3),
+            days: [sampleDay]
+        )
+        
+        return TripCardView(trip: sampleTrip)
             .previewLayout(.sizeThatFits)
             .padding()
     }
