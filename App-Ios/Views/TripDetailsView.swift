@@ -355,7 +355,7 @@ struct BudgetSection: View {
                     .font(.headline)
                 
                 HStack {
-                    Text("$")
+                    Text(CurrencyService.getCurrencySymbol(for: budget.currency))
                     TextField("Total Budget", text: $totalBudget)
                         .keyboardType(.decimalPad)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -369,27 +369,28 @@ struct BudgetSection: View {
                 }
                 .frame(maxWidth: .infinity)
             }
-            
             // Budget Overview
-            VStack(spacing: 12) {
-                ForEach(budget.expenses) { expense in
-                    HStack {
-                        Image(systemName: expense.category.icon)
-                            .foregroundColor(expense.category.color)
-                        Text(expense.note)
-                        Spacer()
-                        VStack(alignment: .trailing) {
-                            Text("\(expense.amount, format: .currency(code: expense.currency))")
-                            if let converted = expense.convertedAmount,
-                               expense.currency != trip.localCurrency {
-                                Text("\(converted, format: .currency(code: trip.localCurrency))")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                    }
-                }
-            }
+                       VStack(spacing: 12) {
+                           ForEach(budget.expenses) { expense in
+                               HStack {
+                                   Image(systemName: expense.category.icon)
+                                       .foregroundColor(expense.category.color)
+                                   Text(expense.note)
+                                   Spacer()
+                                   VStack(alignment: .trailing) {
+                                       if let converted = expense.convertedAmount,
+                                          expense.currency != trip.localCurrency {
+                                           Text("\(converted, format: .currency(code: trip.localCurrency))")
+                                           Text("\(expense.amount, format: .currency(code: expense.currency))")
+                                               .font(.caption)
+                                               .foregroundColor(.secondary)
+                                       } else {
+                                           Text("\(expense.amount, format: .currency(code: expense.currency))")
+                                       }
+                                   }
+                               }
+                           }
+                       }
             
             // Budget Overview
             VStack(spacing: 12) {
@@ -397,9 +398,11 @@ struct BudgetSection: View {
                     Text("Remaining")
                         .fontWeight(.medium)
                     Spacer()
-                    Text("$\(String(format: "%.2f", budget.remainingBudget))")
-                        .foregroundColor(budget.remainingBudget >= 0 ? .green : .red)
-                        .fontWeight(.bold)
+                    AnimatedNumberView(
+                                value: budget.totalBudget - budget.expenses.reduce(0) { total, expense in
+                                    total + (expense.convertedAmount ?? expense.amount)
+                                },
+                                currency: budget.currency)
                 }
                 
                 Divider()
@@ -410,7 +413,10 @@ struct BudgetSection: View {
                         ForEach(BudgetCategory.allCases, id: \.self) { category in
                             let amount = budget.expenses
                                 .filter { $0.category == category }
-                                .reduce(0) { $0 + $1.amount }
+                                .reduce(0) { total, expense in
+                                    total + (expense.convertedAmount ?? expense.amount) // 
+                                }
+
                             
                             if amount > 0 {
                                 HStack {
@@ -419,9 +425,14 @@ struct BudgetSection: View {
                                         .frame(width: 24, height: 24)
                                     Text(category.rawValue)
                                     Spacer()
-                                    Text("$\(String(format: "%.2f", amount))")
+                                    AnimatedNumberView(
+                                        value: amount,
+                                        currency: budget.currency,
+                                        duration: 0.3
+                                    )
                                 }
                                 .padding(.horizontal)
+                                .transition(.opacity.combined(with: .slide))
                             }
                         }
                     }
@@ -455,6 +466,8 @@ struct BudgetSection: View {
                 onUpdate: onUpdate
             )
         }
+        .animation(.spring(response: 0.3), value: budget.expenses)
+        .animation(.spring(response: 0.3), value: budget.totalBudget)
     }
 }
 
@@ -524,6 +537,54 @@ struct ChecklistSection: View {
     }
 }
 
+// New view for displaying category expenses
+struct CategoryExpensesView: View {
+    @Environment(\.dismiss) var dismiss
+    let category: BudgetCategory
+    let expenses: [BudgetExpense]
+    let currency: String
+    let trip: Trip
+    
+    var body: some View {
+        NavigationView {
+            List {
+                ForEach(expenses) { expense in
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text(expense.note)
+                                .font(.headline)
+                            Spacer()
+                            VStack(alignment: .trailing) {
+                                Text("\(expense.amount, format: .currency(code: expense.currency))")
+                                if let converted = expense.convertedAmount,
+                                   expense.currency != trip.localCurrency {
+                                    Text("\(converted, format: .currency(code: trip.localCurrency))")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        }
+                        
+                        Text(expense.date?.formatted(date: .abbreviated, time: .shortened) ?? "")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+            .navigationTitle("\(category.rawValue) Expenses")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
 struct TripDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         let viewModel = TripViewModel()
@@ -532,7 +593,7 @@ struct TripDetailsView_Previews: PreviewProvider {
             startDate: Date(),
             endDate: Date().addingTimeInterval(86400),
             days: [],
-            localCurrency: "USD"
+            localCurrency: "EUR"
         )
         TripDetailsView(viewModel: viewModel, trip: sampleTrip)
     }

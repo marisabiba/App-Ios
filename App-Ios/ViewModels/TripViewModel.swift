@@ -144,9 +144,9 @@ final class TripViewModel: ObservableObject {
         }
         
         do {
-            let currencyService = CurrencyService()
-            let convertedAmount = try await currencyService.convertCurrency(
-                amount: expense.amount,
+            let currencyService = CurrencyService.shared
+            let convertedAmount = try await currencyService.convertAmount(
+                expense.amount,
                 from: expense.currency,
                 to: trips[tripIndex].days[dayIndex].budgetDetails.currency
             )
@@ -155,8 +155,7 @@ final class TripViewModel: ObservableObject {
             DispatchQueue.main.async {
                 var updatedTrip = self.trips[tripIndex]
                 var updatedExpense = expense
-                updatedExpense.amount = convertedAmount
-                updatedExpense.currency = updatedTrip.days[dayIndex].budgetDetails.currency
+                updatedExpense.convertedAmount = convertedAmount
                 updatedTrip.days[dayIndex].budgetDetails.expenses.append(updatedExpense)
                 self.trips[tripIndex] = updatedTrip
             }
@@ -179,5 +178,28 @@ final class TripViewModel: ObservableObject {
         }
         
         return total
+    }
+
+    func getConvertedAmount(amount: Double, from sourceCurrency: String, to targetCurrency: String) -> Double {
+        // If currencies are the same, return original amount
+        if sourceCurrency == targetCurrency {
+            return amount
+        }
+        
+        // Use hardcoded rates for now (you can replace this with real API calls later)
+        let rates: [String: [String: Double]] = [
+            "USD": ["EUR": 0.85, "GBP": 0.73, "JPY": 110.0],
+            "EUR": ["USD": 1.18, "GBP": 0.86, "JPY": 129.5],
+            "GBP": ["USD": 1.37, "EUR": 1.16, "JPY": 150.2],
+            "JPY": ["USD": 0.009, "EUR": 0.0077, "GBP": 0.0067]
+        ]
+        
+        if let targetRates = rates[sourceCurrency],
+           let rate = targetRates[targetCurrency] {
+            return amount * rate
+        }
+        
+        // If no conversion rate found, return original amount
+        return amount
     }
 }

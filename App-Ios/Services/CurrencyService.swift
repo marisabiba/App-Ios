@@ -4,6 +4,53 @@ class CurrencyService {
     static let shared = CurrencyService()
     private let apiKey = APIConfig.currencyAPIKey
     private let baseURL = "https://v6.exchangerate-api.com/v6"
+    private let baseCurrency = "EUR"
+    
+    // Add supported currencies
+    static let supportedCurrencies = [
+        "EUR", // Euro (base currency)
+        "RON", // Romanian Leu
+        "HUF", // Hungarian Forint
+        "MKD", // Macedonian Denar
+        "ALL", // Albanian Lek
+        "USD", // US Dollar
+        "GBP", // British Pound
+        "JPY", // Japanese Yen
+        "AUD", // Australian Dollar
+        "CAD", // Canadian Dollar
+        "CHF", // Swiss Franc
+        "CNY", // Chinese Yuan
+        "INR"  // Indian Rupee
+    ]
+    
+    // Helper method to get currency symbol
+    static func getCurrencySymbol(for currencyCode: String) -> String {
+        let locale = NSLocale(localeIdentifier: currencyCode)
+        if let symbol = locale.displayName(forKey: .currencySymbol, value: currencyCode) {
+            return symbol
+        }
+        return currencyCode
+    }
+    
+    // Update getLocalCurrency to include new currencies
+    func getLocalCurrency(for country: String) -> String {
+        let countryCurrencyMap = [
+            "Romania": "RON",
+            "Hungary": "HUF",
+            "North Macedonia": "MKD",
+            "United States": "USD",
+            "Albania": "ALL",
+            "France": "EUR",
+            "Germany": "EUR",
+            "Italy": "EUR",
+            "Spain": "EUR",
+            "United Kingdom": "GBP",
+            "Japan": "JPY",
+            // ... other existing mappings ...
+        ]
+        
+        return countryCurrencyMap[country] ?? "EUR" // Default to EUR instead of USD
+    }
     
     private var cachedRates: [String: [String: Double]] = [:]
     private var lastUpdateTime: [String: Date] = [:]

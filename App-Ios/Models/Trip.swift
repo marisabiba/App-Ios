@@ -7,9 +7,9 @@ struct Trip: Identifiable, Codable {
     var startDate: Date
     var endDate: Date
     var days: [TripDay]
-    var localCurrency: String // e.g., "USD", "EUR", "JPY"
+    var localCurrency: String
     
-    init(name: String, startDate: Date, endDate: Date, days: [TripDay], localCurrency: String = "USD") {
+    init(name: String, startDate: Date, endDate: Date, days: [TripDay], localCurrency: String = "EUR") {
         self.id = UUID()
         self.name = name
         self.startDate = startDate
@@ -101,42 +101,53 @@ enum ActivityCategory: String, Codable, CaseIterable {
     }
 }
 
-enum BudgetCategory: String, Codable, CaseIterable {
-    case accommodation = "Accommodation"
-    case dining = "Dining"
+struct BudgetExpense: Identifiable, Codable, Equatable {
+    var id: UUID
+    var amount: Double
+    var currency: String
+    var category: BudgetCategory
+    var note: String
+    var convertedAmount: Double?
+    var date: Date?
+    
+    static func == (lhs: BudgetExpense, rhs: BudgetExpense) -> Bool {
+        lhs.id == rhs.id &&
+        lhs.amount == rhs.amount &&
+        lhs.currency == rhs.currency &&
+        lhs.category == rhs.category &&
+        lhs.note == rhs.note &&
+        lhs.convertedAmount == rhs.convertedAmount &&
+        lhs.date == rhs.date
+    }
+}
+
+enum BudgetCategory: String, Codable, CaseIterable, Equatable {
+    case food = "Food"
     case transportation = "Transportation"
+    case accommodation = "Accommodation"
     case activities = "Activities"
     case shopping = "Shopping"
     case other = "Other"
     
     var icon: String {
         switch self {
-        case .accommodation: return "house"
-        case .dining: return "fork.knife"
-        case .transportation: return "car"
-        case .activities: return "ticket"
-        case .shopping: return "bag"
-        case .other: return "circle.grid.cross"
+        case .food: return "fork.knife"
+        case .transportation: return "car.fill"
+        case .accommodation: return "house.fill"
+        case .activities: return "figure.walk"
+        case .shopping: return "bag.fill"
+        case .other: return "ellipsis.circle.fill"
         }
     }
     
     var color: Color {
         switch self {
-        case .accommodation: return .brown
-        case .dining: return .orange
+        case .food: return .orange
         case .transportation: return .blue
+        case .accommodation: return .green
         case .activities: return .purple
-        case .shopping: return .green
+        case .shopping: return .pink
         case .other: return .gray
         }
     }
-}
-
-struct BudgetExpense: Identifiable, Codable {
-    var id = UUID()
-    var category: BudgetCategory
-    var amount: Double
-    var note: String
-    var currency: String // The currency in which the expense was made
-    var convertedAmount: Double? // Amount converted to trip's local currency
 }
