@@ -15,14 +15,6 @@ struct AddActivityView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Activity Details")) {
-                    DatePicker("Time", selection: $time, displayedComponents: [.hourAndMinute])
-                    TextField("Activity Title", text: $title)
-                    TextField("Location", text: $location)
-                    TextField("Notes", text: $notes, axis: .vertical)
-                        .lineLimit(3...6)
-                }
-                
                 Section(header: Text("Category")) {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
@@ -47,7 +39,15 @@ struct AddActivityView: View {
                         .padding(.vertical, 8)
                     }
                 }
-            }
+
+                Section(header: Text("Activity Details")) {
+                    DatePicker("Time", selection: $time, displayedComponents: [.hourAndMinute])
+                    TextField("Activity Title", text: $title)
+                    TextField("Location", text: $location)
+                    TextField("Notes", text: $notes, axis: .vertical)
+                        .lineLimit(3...6)
+                }
+                            }
             .navigationTitle("New Activity")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -319,12 +319,6 @@ struct TransportationSection: View {
                 }
             }
             .padding(.horizontal)
-            
-            DatePicker("Time", selection: $time, displayedComponents: .hourAndMinute)
-                .onChange(of: time) { newValue in
-                    onUpdate(TransportationDetails(mode: mode, time: newValue))
-                }
-                .padding(.horizontal)
         }
     }
 }
@@ -337,7 +331,8 @@ struct BudgetSection: View {
     let onUpdate: (BudgetDetails) -> Void
     @State private var showingAddExpense = false
     @State private var totalBudget: String
-    
+    @State private var expandedCategory: BudgetCategory? 
+
     init(budget: BudgetDetails, trip: Trip, viewModel: TripViewModel, dayIndex: Int, onUpdate: @escaping (BudgetDetails) -> Void) {
         self.budget = budget
         self.trip = trip
@@ -346,19 +341,34 @@ struct BudgetSection: View {
         self.onUpdate = onUpdate
         _totalBudget = State(initialValue: String(format: "%.2f", budget.totalBudget))
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Total Budget Section
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 12) {
                 Text("Total Budget")
                     .font(.headline)
-                
-                HStack {
+                    .padding(.bottom, 4)
+
+                HStack(spacing: 8) {
+                    // Currency Symbol
                     Text(CurrencyService.getCurrencySymbol(for: budget.currency))
-                    TextField("Total Budget", text: $totalBudget)
+                        .font(.title3)
+                        .padding(.vertical, 8)
+                        .frame(width: 40, alignment: .center)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(8)
+
+                    // Text Field
+                    TextField("Enter amount", text: $totalBudget)
                         .keyboardType(.decimalPad)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding(10)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.blue.opacity(0.7), lineWidth: 1)
+                        )
                         .onChange(of: totalBudget) { newValue in
                             if let newAmount = Double(newValue) {
                                 var updatedBudget = budget
@@ -368,30 +378,20 @@ struct BudgetSection: View {
                         }
                 }
                 .frame(maxWidth: .infinity)
+
+                let remainingBudget = budget.totalBudget - budget.expenses.reduce(0) { $0 + ($1.convertedAmount ?? $1.amount) }
+                let progress = remainingBudget / budget.totalBudget
+
+                ProgressView(value: progress)
+                    .progressViewStyle(LinearProgressViewStyle(tint: .blue))
+                    .padding(.top)
+                Text("\(remainingBudget, format: .currency(code: budget.currency)) remaining")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
             }
-            // Budget Overview
-                       VStack(spacing: 12) {
-                           ForEach(budget.expenses) { expense in
-                               HStack {
-                                   Image(systemName: expense.category.icon)
-                                       .foregroundColor(expense.category.color)
-                                   Text(expense.note)
-                                   Spacer()
-                                   VStack(alignment: .trailing) {
-                                       if let converted = expense.convertedAmount,
-                                          expense.currency != trip.localCurrency {
-                                           Text("\(converted, format: .currency(code: trip.localCurrency))")
-                                           Text("\(expense.amount, format: .currency(code: expense.currency))")
-                                               .font(.caption)
-                                               .foregroundColor(.secondary)
-                                       } else {
-                                           Text("\(expense.amount, format: .currency(code: expense.currency))")
-                                       }
-                                   }
-                               }
-                           }
-                       }
-            
+            .padding()
+
             // Budget Overview
             VStack(spacing: 12) {
                 HStack {
@@ -399,51 +399,92 @@ struct BudgetSection: View {
                         .fontWeight(.medium)
                     Spacer()
                     AnimatedNumberView(
-                                value: budget.totalBudget - budget.expenses.reduce(0) { total, expense in
-                                    total + (expense.convertedAmount ?? expense.amount)
-                                },
-                                currency: budget.currency)
+                        value: budget.totalBudget - budget.expenses.reduce(0) { total, expense in
+                            total + (expense.convertedAmount ?? expense.amount)
+                        },
+                        currency: budget.currency
+                    )
                 }
-                
+
                 Divider()
-                
+
                 // Expenses by Category
                 ScrollView {
                     VStack(spacing: 8) {
                         ForEach(BudgetCategory.allCases, id: \.self) { category in
-                            let amount = budget.expenses
+                            // Calculate total amount for the category
+                            let categoryTotal = budget.expenses
                                 .filter { $0.category == category }
                                 .reduce(0) { total, expense in
-                                    total + (expense.convertedAmount ?? expense.amount) // 
+                                    total + (expense.convertedAmount ?? expense.amount)
                                 }
 
-                            
-                            if amount > 0 {
-                                HStack {
-                                    Image(systemName: category.icon)
-                                        .foregroundColor(category.color)
-                                        .frame(width: 24, height: 24)
-                                    Text(category.rawValue)
-                                    Spacer()
-                                    AnimatedNumberView(
-                                        value: amount,
-                                        currency: budget.currency,
-                                        duration: 0.3
-                                    )
+                            if categoryTotal > 0 {
+                                VStack {
+                                    // Category Header with dropdown toggle
+                                    HStack {
+                                        Image(systemName: category.icon)
+                                            .foregroundColor(category.color)
+                                            .frame(width: 24, height: 24)
+                                        Text(category.rawValue)
+                                        Spacer()
+                                        AnimatedNumberView(
+                                            value: categoryTotal,
+                                            currency: budget.currency,
+                                            duration: 0.3
+                                        )
+                                        Button(action: {
+                                            // Toggle the expanded state for this category
+                                            if expandedCategory == category {
+                                                expandedCategory = nil
+                                            } else {
+                                                expandedCategory = category
+                                            }
+                                        }) {
+                                            Image(systemName: expandedCategory == category ? "chevron.up" : "chevron.down")
+                                                .foregroundColor(.blue)
+                                        }
+                                    }
+                                    .padding(.horizontal)
+
+                                    // Show details when the category is expanded
+                                    if expandedCategory == category {
+                                        VStack(spacing: 8) {
+                                            ForEach(budget.expenses.filter { $0.category == category }) { expense in
+                                                HStack {
+                                                    Text(expense.note)
+                                                        .font(.body)
+                                                    Spacer()
+                                                    VStack(alignment: .trailing) {
+                                                        if let converted = expense.convertedAmount,
+                                                           expense.currency != trip.localCurrency {
+                                                            Text("\(converted, format: .currency(code: trip.localCurrency))")
+                                                            Text("\(expense.amount, format: .currency(code: expense.currency))")
+                                                                .font(.caption)
+                                                                .foregroundColor(.secondary)
+                                                        } else {
+                                                            Text("\(expense.amount, format: .currency(code: expense.currency))")
+                                                        }
+                                                    }
+                                                }
+                                                .padding(.horizontal)
+                                                .transition(.opacity.combined(with: .slide))
+                                            }
+                                        }
+                                        .padding(.horizontal)
+                                    }
                                 }
-                                .padding(.horizontal)
-                                .transition(.opacity.combined(with: .slide))
                             }
                         }
                     }
                 }
-                .frame(maxHeight: 200)
+                .frame(maxHeight: 400)
             }
             .padding()
             .background(Color(.systemBackground))
             .cornerRadius(10)
             .shadow(radius: 2)
-            
+
             // Add Expense Button
             Button(action: { showingAddExpense = true }) {
                 HStack {
@@ -471,6 +512,7 @@ struct BudgetSection: View {
     }
 }
 
+
 struct ActivityCard: View {
     let activity: Activity
     
@@ -493,8 +535,6 @@ struct ActivityCard: View {
             
             Spacer()
             
-            Image(systemName: "chevron.right")
-                .foregroundColor(.gray)
         }
         .padding()
         .background(Color(.systemBackground))
