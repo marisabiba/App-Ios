@@ -11,6 +11,7 @@
 		6D0CD9E92D3FC33300FE6F66 /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0CD9E82D3FC33300FE6F66 /* APIConfig.swift */; };
 		6D0CD9ED2D400C1F00FE6F66 /* BudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0CD9EC2D400C1F00FE6F66 /* BudgetView.swift */; };
 		6D0CD9F02D400C3500FE6F66 /* AnimatedNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0CD9EF2D400C3500FE6F66 /* AnimatedNumberView.swift */; };
+		6D941FFB2D4117130073AB62 /* PDFGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D941FFA2D4117130073AB62 /* PDFGenerator.swift */; };
 		6DF1DC932D3FBA8F00FDB264 /* AddExpenseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF1DC922D3FBA8F00FDB264 /* AddExpenseView.swift */; };
 		A3711AC22D29F8C200BCCC7F /* TripViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3711AC12D29F8C200BCCC7F /* TripViewModel.swift */; };
 		A3711AC42D29F94600BCCC7F /* ItineraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3711AC32D29F94600BCCC7F /* ItineraryView.swift */; };
@@ -38,6 +39,7 @@
 		6D0CD9E82D3FC33300FE6F66 /* APIConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
 		6D0CD9EC2D400C1F00FE6F66 /* BudgetView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BudgetView.swift; sourceTree = "<group>"; };
 		6D0CD9EF2D400C3500FE6F66 /* AnimatedNumberView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimatedNumberView.swift; sourceTree = "<group>"; };
+		6D941FFA2D4117130073AB62 /* PDFGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFGenerator.swift; sourceTree = "<group>"; };
 		6DF1DC922D3FBA8F00FDB264 /* AddExpenseView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddExpenseView.swift; sourceTree = "<group>"; };
 		A3711AC12D29F8C200BCCC7F /* TripViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripViewModel.swift; sourceTree = "<group>"; };
 		A3711AC32D29F94600BCCC7F /* ItineraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItineraryView.swift; sourceTree = "<group>"; };
@@ -92,6 +94,7 @@
 			isa = PBXGroup;
 			children = (
 				6D0CD9EF2D400C3500FE6F66 /* AnimatedNumberView.swift */,
+				6D941FFA2D4117130073AB62 /* PDFGenerator.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -258,6 +261,7 @@
 				A372F7AD2D29D052002ADD73 /* Day.swift in Sources */,
 				6DF1DC932D3FBA8F00FDB264 /* AddExpenseView.swift in Sources */,
 				6D0CD9E52D3FBF0E00FE6F66 /* CurrencyService.swift in Sources */,
+				6D941FFB2D4117130073AB62 /* PDFGenerator.swift in Sources */,
 				A372F7AB2D29CF67002ADD73 /* ItineraryCard.swift in Sources */,
 				A3711ACA2D2A028E00BCCC7F /* TripDetailsView.swift in Sources */,
 				A372F7B12D29D0B1002ADD73 /* Accommodation.swift in Sources */,

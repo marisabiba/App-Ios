@@ -37,15 +37,6 @@ struct TripDay: Identifiable, Codable {
     var checklist: [ChecklistItem]
 }
 
-struct Activity: Identifiable, Codable {
-    var id = UUID()
-    var time: Date
-    var title: String
-    var location: String
-    var notes: String
-    var category: ActivityCategory
-}
-
 struct TransportationDetails: Codable {
     var mode: String
     var time: Date

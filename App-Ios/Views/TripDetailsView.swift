@@ -60,6 +60,24 @@ struct TripDetailsView: View {
                     } label: {
                         Label("Delete Trip", systemImage: "trash")
                     }
+                    Button(action: {
+                        guard let pdfURL = PDFGenerator.generatePDF(for: trip) else { return }
+                        
+                        // Share the PDF
+                        let activityVC = UIActivityViewController(activityItems: [pdfURL], applicationActivities: nil)
+                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                           let rootVC = windowScene.windows.first?.rootViewController {
+                            rootVC.present(activityVC, animated: true, completion: nil)
+                        }
+                    }) {
+                        Text("Export to PDF")
+                            .fontWeight(.semibold)
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                    
                 } label: {
                     Image(systemName: "ellipsis.circle")
                         .foregroundStyle(.blue)
@@ -92,8 +110,6 @@ struct DayTab: View {
         VStack(spacing: 4) {
             Text(title)
                 .font(.headline)
-            Text(date.formatted(.dateTime.day().month()))
-                .font(.caption)
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
@@ -150,16 +166,6 @@ struct DayPlanView: View {
                         onAddActivity: { showingAddActivity = true }
                     )
                     
-                    // Transportation Details
-                    TransportationSection(
-                        transportation: trip.days[dayIndex].transportationDetails
-                    ) { newTransportation in
-                        viewModel.updateTransportation(
-                            tripId: trip.id,
-                            dayIndex: dayIndex,
-                            transportation: newTransportation
-                        )
-                    }
                     
                     // Budget Details
                     BudgetSection(
@@ -175,6 +181,17 @@ struct DayPlanView: View {
                             )
                         }
                     )
+                    
+                    // Transportation Details
+                    TransportationSection(
+                        transportation: trip.days[dayIndex].transportationDetails
+                    ) { newTransportation in
+                        viewModel.updateTransportation(
+                            tripId: trip.id,
+                            dayIndex: dayIndex,
+                            transportation: newTransportation
+                        )
+                    }
                 }
             }
             .padding()
@@ -195,11 +212,7 @@ struct DayHeaderSection: View {
         VStack(alignment: .leading) {
             Text(date.formatted(date: .long, time: .omitted))
                 .font(.headline)
-            TextField("Day Title", text: $dayTitle)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .onChange(of: dayTitle) { newValue in
-                    onTitleChanged(newValue)
-                }
+
         }
     }
 }
@@ -331,7 +344,7 @@ struct BudgetSection: View {
     let onUpdate: (BudgetDetails) -> Void
     @State private var showingAddExpense = false
     @State private var totalBudget: String
-    @State private var expandedCategory: BudgetCategory? 
+    @State private var expandedCategory: BudgetCategory?
 
     init(budget: BudgetDetails, trip: Trip, viewModel: TripViewModel, dayIndex: Int, onUpdate: @escaping (BudgetDetails) -> Void) {
         self.budget = budget
